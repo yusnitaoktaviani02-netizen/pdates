@@ -60,7 +60,7 @@ streamlit run app.py
 2. Isi setiap rekod diubah menjadi teks berlabel agar metadata dan informasi keterlacakan ikut terbawa.
 3. Gemini `gemini-embedding-001` mengubah rekod menjadi embedding dan menyimpannya sementara melalui cache Streamlit.
 4. Pertanyaan pengguna di-embed; pencarian cosine similarity mengambil rekod relevan.
-5. `gemini-2.5-flash` menyusun jawaban dari konteks yang diambil, dengan instruksi agar tidak mengarang informasi dan menyebut keterbatasan data.
+5. `gemini-3.8-flash` menyusun jawaban dari konteks yang diambil, dengan instruksi agar tidak mengarang informasi dan menyebut keterbatasan data.
 6. Aplikasi menampilkan judul, ID rekod, dokumen, halaman, cuplikan, dan tautan sumber bila tersedia.
 
 ## Sebelum dibuka untuk publik
@@ -72,7 +72,7 @@ streamlit run app.py
 
 ## Catatan teknis
 
-- Embedding dan jawaban generatif memerlukan API key OpenAI yang aktif serta akses jaringan dari aplikasi.
+- Embedding dan jawaban generatif memerlukan Gemini API key yang aktif serta akses jaringan dari aplikasi.
 - Indeks dibangun dari data workbook dan disimpan dalam cache runtime, bukan database permanen. Cache dapat dibangun ulang setelah restart.
 - Untuk volume besar, gunakan vector database persisten dan tambahkan autentikasi, rate limiting, monitoring, serta pipeline pembaruan data.
 
@@ -86,4 +86,16 @@ streamlit run app.py
 
 ## Versi Gemini API
 
-Versi ini menggunakan Google Gemini untuk generasi jawaban (`gemini-2.5-flash`) dan embedding (`gemini-embedding-001`). Buat API key di [Google AI Studio](https://aistudio.google.com/apikey), lalu tambahkan ke Streamlit Secrets dengan format `GEMINI_API_KEY = "..."`. Ketersediaan model, kuota gratis, dan batas permintaan dapat berbeda menurut akun/region dan dapat berubah; periksa Google AI Studio bila muncul error kuota.
+Versi ini menggunakan Google Gemini untuk generasi jawaban (`gemini-3.8-flash`) dan embedding (`gemini-embedding-001`). Buat API key di [Google AI Studio](https://aistudio.google.com/apikey), lalu tambahkan ke Streamlit Secrets dengan format `GEMINI_API_KEY = "..."`. Ketersediaan model, kuota gratis, dan batas permintaan dapat berbeda menurut akun/region dan dapat berubah; periksa Google AI Studio bila muncul error kuota.
+
+
+## Model generatif yang kompatibel
+
+Kode terbaru menggunakan `gemini-3.8-flash` sebagai default karena dokumentasi Gemini API saat ini merekomendasikannya untuk proyek baru. Jika model ini tidak tersedia untuk project Anda, periksa model yang tersedia di dokumentasi Gemini API atau ubah `GEMINI_MODEL` pada Streamlit Secrets ke model stabil yang didukung akun Anda. Contoh:
+
+```toml
+GEMINI_API_KEY = "AIza..."
+GEMINI_MODEL = "gemini-3.8-flash"
+```
+
+Embedding tetap menggunakan `gemini-embedding-001`. Jangan mengubah nama model embedding menjadi model generatif.

@@ -152,6 +152,13 @@ def api_key():
     except Exception:
         return os.getenv("GEMINI_API_KEY", "")
 
+def generation_model():
+    """Pilih model generatif; default ke model stabil yang direkomendasikan saat ini."""
+    try:
+        return st.secrets.get("GEMINI_MODEL", "gemini-3.8-flash") or os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    except Exception:
+        return os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+
 @st.cache_resource(show_spinner=False)
 def gemini_client(key):
     from google import genai
@@ -213,7 +220,7 @@ Jika pertanyaan tidak dapat dijawab dari konteks, jelaskan keterbatasan data dan
     prompt = f"Pertanyaan publik: {question}\n\nKonteks hasil retrieval:\n{context}\n\nJawab berdasarkan konteks dan cantumkan sumber yang digunakan."
     from google.genai import types
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model=generation_model(),
         contents=prompt,
         config=types.GenerateContentConfig(system_instruction=system, temperature=0.1),
     )
