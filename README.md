@@ -17,10 +17,10 @@ Aplikasi Streamlit untuk publikasi dan penelusuran workbook metadata dokumentasi
 4. Pada **Advanced settings / Secrets**, tambahkan:
 
    ```toml
-   OPENAI_API_KEY = "sk-..."
+   GEMINI_API_KEY = "AIza..."
    ```
 
-5. Deploy. Saat pertama kali digunakan, aplikasi membuat indeks embeddings dari rekod di workbook. Proses ini memakai OpenAI API dan dapat menimbulkan biaya API.
+5. Deploy. Saat pertama kali digunakan, aplikasi membuat indeks embeddings dari rekod di workbook. Proses ini memakai Gemini API dan dapat menimbulkan biaya API.
 6. Jangan pernah menaruh API key langsung di `app.py`, GitHub, atau file yang dipublikasikan.
 
 > “streamlit.ai” yang umum dimaksud untuk hosting aplikasi adalah Streamlit Community Cloud di `share.streamlit.io`.
@@ -44,13 +44,13 @@ Atur API key sebelum menjalankan agar jawaban generatif aktif:
 
 **Windows PowerShell**
 ```powershell
-$env:OPENAI_API_KEY="sk-..."
+$env:GEMINI_API_KEY="AIza..."
 streamlit run app.py
 ```
 
 **macOS/Linux**
 ```bash
-export OPENAI_API_KEY="sk-..."
+export GEMINI_API_KEY="AIza..."
 streamlit run app.py
 ```
 
@@ -58,9 +58,9 @@ streamlit run app.py
 
 1. Aplikasi membaca sheet dokumen sumber, elemen arsitektur, inventarisasi kerusakan, panduan pelestarian, dan chunk RAG.
 2. Isi setiap rekod diubah menjadi teks berlabel agar metadata dan informasi keterlacakan ikut terbawa.
-3. OpenAI `text-embedding-3-small` mengubah rekod menjadi embedding dan menyimpannya sementara melalui cache Streamlit.
+3. Gemini `gemini-embedding-001` mengubah rekod menjadi embedding dan menyimpannya sementara melalui cache Streamlit.
 4. Pertanyaan pengguna di-embed; pencarian cosine similarity mengambil rekod relevan.
-5. `gpt-4o-mini` menyusun jawaban dari konteks yang diambil, dengan instruksi agar tidak mengarang informasi dan menyebut keterbatasan data.
+5. `gemini-2.5-flash` menyusun jawaban dari konteks yang diambil, dengan instruksi agar tidak mengarang informasi dan menyebut keterbatasan data.
 6. Aplikasi menampilkan judul, ID rekod, dokumen, halaman, cuplikan, dan tautan sumber bila tersedia.
 
 ## Sebelum dibuka untuk publik
@@ -75,3 +75,15 @@ streamlit run app.py
 - Embedding dan jawaban generatif memerlukan API key OpenAI yang aktif serta akses jaringan dari aplikasi.
 - Indeks dibangun dari data workbook dan disimpan dalam cache runtime, bukan database permanen. Cache dapat dibangun ulang setelah restart.
 - Untuk volume besar, gunakan vector database persisten dan tambahkan autentikasi, rate limiting, monitoring, serta pipeline pembaruan data.
+
+
+## Catatan perbaikan versi
+- Jika `GEMINI_API_KEY` belum dikonfigurasi, aplikasi berjalan dalam mode pencarian kata kunci dan tidak menghasilkan jawaban generatif.
+- Pencarian kata kunci diperluas untuk istilah kerusakan dan elemen terkait.
+- Pertanyaan "berapa pintu yang rusak?" ditangani dengan jawaban terstruktur: workbook mencatat dua rekod terkait pintu (daun pintu retak dan cat kusen pintu mengelupas), tetapi tidak memastikan jumlah fisik pintu yang terdampak.
+- Baris pada `Chunk_RAG` hanya dimasukkan ke indeks publik jika `access_level` bernilai `public`. Rekod `internal` tidak ditampilkan melalui chunk tersebut. Tetap tinjau hak publikasi semua sheet sebelum meluncurkan aplikasi.
+
+
+## Versi Gemini API
+
+Versi ini menggunakan Google Gemini untuk generasi jawaban (`gemini-2.5-flash`) dan embedding (`gemini-embedding-001`). Buat API key di [Google AI Studio](https://aistudio.google.com/apikey), lalu tambahkan ke Streamlit Secrets dengan format `GEMINI_API_KEY = "..."`. Ketersediaan model, kuota gratis, dan batas permintaan dapat berbeda menurut akun/region dan dapat berubah; periksa Google AI Studio bila muncul error kuota.
